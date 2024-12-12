@@ -1,4 +1,3 @@
-const { hash } = require('bcrypt');
 const db = require('../db/db');
 const joi = require('joi');
 
@@ -86,7 +85,7 @@ exports.deletarProduto = async (req, res) => {
         if (result.length === 0) {
             return res.status(400).json({ error: 'Produto não encontrado' });
         }
-        await db.query('DELETE FROM produto WHERE cpf = ?', [idProduto]);
+        await db.query('DELETE FROM produto WHERE idProduto = ?', [idProduto]);
         res.json({ message: 'Produto deletado com sucesso' });
     } catch (err) {
         console.error('Erro ao deletar o produto:', err);
