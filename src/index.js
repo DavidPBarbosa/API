@@ -11,7 +11,7 @@ const db = require('./db/db')
 const routes = require('./routes/routes'); // Importa as rotas
 const clienteRoutes = require('./routes/clienteroutes');
 const produtoRoutes = require('./routes/produtoroutes');
-const entregadorRoutes = require('./routes/entragadorroutes');
+const entregadorRoutes = require('./routes/entregadorroutes');
 const pedidoRoutes = require('./routes/pedidoroutes');
 const corsOptions = {
     origin: ['http://localhost:3333', 'https://meudominio.com'], //lista de origens permitidas
