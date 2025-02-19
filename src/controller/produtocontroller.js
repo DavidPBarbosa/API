@@ -3,11 +3,11 @@ const joi = require('joi');
 
 const produtoSchema = joi.object({
     idProduto: joi.string().required(),
-    nomeProduto: joi.string().required(30),
-    tipo: joi.string().required(30),
-    descricao: joi.string().required(100),
+    nomeProduto: joi.string().required(),
+    tipo: joi.string().required(),
+    descricao: joi.string().required(),
     valorUnit: joi.string().required(),
-    imagem: joi.string().required(200)
+    imagem: joi.string().required()
 });
 exports.listarProduto = async (req, res) => {
     try {
@@ -50,8 +50,8 @@ exports.adicionarProduto = async (req, res) => {
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
     } try {
-        const novoProduto = { idProduto, nomeProduto, tipo, descricao, valorUnit, imagem: hash };
-        await db.query('INSERT INFO produto SET ?', novoProduto);
+        const novoProduto = { idProduto, nomeProduto, tipo, descricao, valorUnit, imagem };
+        await db.query('INSERT INTO produto SET ?', novoProduto);
         res.json({ message: 'Produto adicionado com sucesso' });
     } catch (err) {
         console.error('Erro ao adicionar cliente:', err);
@@ -61,7 +61,7 @@ exports.adicionarProduto = async (req, res) => {
 exports.atualizarProduto = async (req, res) => {
     const { idProduto } = req.params;
     const { nomeProduto, tipo, descricao, valorUnit, imagem } = req.body;
-    const { error } = produtoSchema.validate({ idProduto, nomeProduto, tipo, descricao, valorUnit, imagem });
+    const { error } = produtoSchema.validate({idProduto, nomeProduto, tipo, descricao, valorUnit, imagem });
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
     }
@@ -70,7 +70,7 @@ exports.atualizarProduto = async (req, res) => {
         if (result.length === 0) {
             return res.status(400).json({ error: 'Produto não encontrado' });
         }
-        const produtoAtualizado = { nomeProduto, tipo, descricao, valorUnit, imagem: hash };
+        const produtoAtualizado = { idProduto, nomeProduto, tipo, descricao, valorUnit, imagem };
         await db.query('UPDATE produto SET ? WHERE idProduto = ?', [produtoAtualizado, idProduto]);
         res.json({ message: 'Produto atualizado com sucesso' });
     } catch (err) {

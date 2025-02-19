@@ -2,11 +2,10 @@ const db = require('../db/db');
 const joi = require('joi'); 
 
 const itemSchema = joi.object({
-    idItem: joi.string().length(100).required(),
     qtde: joi.string().required().max(50),
     valorParcial: joi.string().required(80),
-    idProduto: joi.string().length(100).required(),
-    idPedido: joi.string().length(100).required(),    
+    idProduto: joi.string().required(),
+    idPedido: joi.string().required(),    
 });
 exports.listarItemPedido = async (req, res) => {
     try {
@@ -31,13 +30,13 @@ exports.listarItemID = async (req, res) => {
     }
 };
 exports.adicionarItemPedido = async (req, res) => {
-    const { idItem, qtde, valorParcial, idProduto, idPedido } = req.body;
-    const { error } = clienteSchema.validate({ idItem, qtde, valorParcial, idProduto, idPedido });
+    const { qtde, valorParcial, idProduto, idPedido } = req.body;
+    const { error } = itemSchema.validate({ qtde, valorParcial, idProduto, idPedido });
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
     }
     try {
-        const novoItemPedido = { idItem, qtde, valorParcial, idProduto, idPedido: hash };
+        const novoItemPedido = { qtde, valorParcial, idProduto, idPedido };
         await db.query('INSERT INTO itempedido SET ?', novoItemPedido);
         res.json({ message: 'Item do pedido adicionado com sucesso' });
     } catch (err) {
@@ -48,7 +47,7 @@ exports.adicionarItemPedido = async (req, res) => {
 exports.atualizarItemPedido = async (req, res) => {
     const { idItem } = req.params;
     const { qtde, valorParcial, idProduto, idPedido } = req.body;
-    const { error } = clienteSchema.validate({ qtde, valorParcial, idProduto, idPedido });
+    const { error } = itemSchema.validate({ qtde, valorParcial, idProduto, idPedido });
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
     }
@@ -57,7 +56,7 @@ exports.atualizarItemPedido = async (req, res) => {
         if (result.length === 0) {
             return res.status(400).json({ error: 'Item do pedido não encontrado' });
         }
-        const itempedidoAtualizado = { qtde, valorParcial, idProduto, idPedido: hash };
+        const itempedidoAtualizado = { qtde, valorParcial, idProduto, idPedido };
         await db.query('UPDATE itempedido SET ? WHERE idItem = ?', [itempedidoAtualizado, idItem]);
         res.json({ message: 'Item do pedido atulizado com sucesso' });
     } catch (err) {

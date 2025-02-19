@@ -2,7 +2,6 @@ const db = require('../db/db');
 const joi = require('joi');
 
 const entregadorSchema = joi.object({
-    idEntregador: joi.string().required(),
     nomeEntregador: joi.string().required(),
     cnh: joi.string().required(),
     telefoneEntregador: joi.string().required()
@@ -19,7 +18,7 @@ exports.listarEntregador = async (req, res) => {
 exports.buscaEntregadorID = async (req, res) => {
     const { idEntregador } = req.params;
     try {
-        const [result] = await db.query('SELECT * FROM entregador WHERE idEntregador LIKE ?', [`${idEntregador}%`]);
+        const [result] = await db.query('SELECT * FROM entregador WHERE idEntregador LIKE ?', [`${idEntregador}`]);
         if (result.length === 0) {
             return res.status(404).json({ error: 'Entregador não encontrado' });
         }
@@ -30,13 +29,13 @@ exports.buscaEntregadorID = async (req, res) => {
     }
 };
 exports.adicionarEntregador = async (req, res) => {
-    const { idEntregador, nomeEntregador, cnh, telefoneEntregador } = req.body;
-    const { error } = entregadorSchema.validate({ idEntregador, nomeEntregador, cnh, telefoneEntregador });
+    const {  nomeEntregador, cnh, telefoneEntregador } = req.body;
+    const { error } = entregadorSchema.validate({  nomeEntregador, cnh, telefoneEntregador });
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
     } try {
-        const novoEntregador = { idEntregador, nomeEntregador, cnh, telefoneEntregador: hash };
-        await db.query('INSERT INFO entregador SET ?', novoEntregador);
+        const novoEntregador = { nomeEntregador, cnh, telefoneEntregador };
+        await db.query('INSERT INTO entregador SET ?', novoEntregador);
         res.json({ message: 'Entregador adicionado com sucesso' });
     } catch (err) {
         console.error('Erro ao adicionar entregador:', err);
@@ -45,8 +44,8 @@ exports.adicionarEntregador = async (req, res) => {
 };
 exports.atualizarEntregador = async (req, res) => {
     const { idEntregador } = req.params;
-    const { telefoneEntregador } = req.body;
-    const { error } = entregadorSchema.validate({ idEntregador, telefoneEntregador });
+    const { nomeEntregador, cnh, telefoneEntregador } = req.body;
+    const { error } = entregadorSchema.validate({ nomeEntregador, cnh, telefoneEntregador });
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
     }
@@ -55,7 +54,7 @@ exports.atualizarEntregador = async (req, res) => {
         if (result.length === 0) {
             return res.status(400).json({ error: 'Entregador não encontrado' });
         }
-        const entregadorAtualizado = { telefoneEntregador: hash };
+        const entregadorAtualizado = { nomeEntregador, telefoneEntregador };
         await db.query('UPDATE entregador SET ? WHERE idEntregador = ?', [entregadorAtualizado, idEntregador]);
         res.json({ message: 'Entregador atualizado com sucesso' });
     } catch (err) {

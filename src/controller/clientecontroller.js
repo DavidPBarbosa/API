@@ -84,7 +84,7 @@ exports.atualizarCliente = async (req, res) => {
         }
         //criptografando a senha
         const hash = await bcrypt.hash(senha, 10);
-        const clienteAtualizado = { nome, endereco, bairro, complemento, cep, telefone, email, senha: hash };
+        const clienteAtualizado = { nome, endereco, bairro, cidade, cep, telefone, email, senha: hash };
         await db.query('UPDATE cliente SET ? WHERE cpf = ?', [clienteAtualizado, cpf]);
         res.json({ message: 'Cliente atulizado com sucesso' });
     } catch (err) {

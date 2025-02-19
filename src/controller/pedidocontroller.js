@@ -2,7 +2,6 @@ const db = require('../db/db');
 const joi = require('joi');
 
 const pedidoSchema = joi.object({
-    idPedido: joi.string().required(),
     dataPedido: joi.string().required(),
     qtdeItens: joi.string().required(),
     formaPagto: joi.string().required(),
@@ -23,7 +22,7 @@ exports.listarPedido = async (req, res) => {
 exports.buscaPedidoID = async (req, res) => {
     const { idPedido } = req.params;
     try {
-        const [result] = await db.query('SELECT * FROM pedido WHERE idPedido LIKE ?', [`${idPedido}%`]);
+        const [result] = await db.query('SELECT * FROM pedido WHERE idPedido LIKE ?', [`${idPedido}`]);
         if (result.length === 0) {
             return res.status(404).json({ error: 'Pedido não encontrado' });
         }
@@ -36,7 +35,7 @@ exports.buscaPedidoID = async (req, res) => {
 exports.buscaIdEntregador = async (req, res) => {
     const { idEntregador } = req.params;
     try {
-        const [result] = await db.query('SELECT * FROM pedido WHERE idEntregador LIKE ?', [`${idEntregador}%`]);
+        const [result] = await db.query('SELECT * FROM pedido WHERE idEntregador LIKE ?', [`${idEntregador}`]);
         if (result.length === 0) {
             return res.status(404).json({ error: 'Pedido não encontrado' });
         }
@@ -49,7 +48,7 @@ exports.buscaIdEntregador = async (req, res) => {
 exports.buscaCPF = async (req, res) => {
     const { cpf} = req.params;
     try {
-        const [result] = await db.query('SELECT * FROM pedido WHERE cpf LIKE ?', [`${cpf}%`]);
+        const [result] = await db.query('SELECT * FROM pedido WHERE cpf LIKE ?', [`${cpf}`]);
         if (result.length === 0) {
             return res.status(404).json({ error: 'Pedido não encontrado' });
         }
@@ -60,13 +59,13 @@ exports.buscaCPF = async (req, res) => {
     }
 };
 exports.adicionarPedido = async (req, res) => {
-    const { idPedido, dataPedido, qtdeItens, formaPagto, valorTotal, observacao, cpf, idEntregador } = req.body;
-    const { error } = pedidoSchema.validate({ idPedido, dataPedido, qtdeItens, formaPagto, valorTotal, observacao, cpf, idEntregador });
+    const { dataPedido, qtdeItens, formaPagto, valorTotal, observacao, cpf, idEntregador } = req.body;
+    const { error } = pedidoSchema.validate({ dataPedido, qtdeItens, formaPagto, valorTotal, observacao, cpf, idEntregador });
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
     } try {
-        const novoPedido = { idPedido, dataPedido, qtdeItens, formaPagto, valorTotal, observacao, cpf, idEntregador: hash };
-        await db.query('INSERT INFO pedido SET ?', novoPedido);
+        const novoPedido = { dataPedido, qtdeItens, formaPagto, valorTotal, observacao, cpf, idEntregador };
+        await db.query('INSERT INTO pedido SET ?', novoPedido);
         res.json({ message: 'Pedido adicionado com sucesso' });
     } catch (err) {
         console.error('Erro ao adicionar pedido:', err);
@@ -76,7 +75,7 @@ exports.adicionarPedido = async (req, res) => {
 exports.atualizarPedido = async (req, res) => {
     const { idPedido } = req.params;
     const { dataPedido, qtdeItens, formaPagto, valorTotal, observacao, cpf, idEntregador} = req.body;
-    const { error } = pedidoSchema.validate({ idPedido, dataPedido, qtdeItens, formaPagto, valorTotal, observacao, cpf, idEntregador });
+    const { error } = pedidoSchema.validate({ dataPedido, qtdeItens, formaPagto, valorTotal, observacao, cpf, idEntregador });
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
     }
@@ -85,7 +84,7 @@ exports.atualizarPedido = async (req, res) => {
         if (result.length === 0) {
             return res.status(400).json({ error: 'Pedido não encontrado' });
         }
-        const pedidoAtualizado = { dataPedido, qtdeItens, formaPagto, valorTotal, observacao, cpf, idEntregador: hash };
+        const pedidoAtualizado = { dataPedido, qtdeItens, formaPagto, valorTotal, observacao, cpf, idEntregador };
         await db.query('UPDATE pedido SET ? WHERE idPedido = ?', [pedidoAtualizado, idPedido]);
         res.json({ message: 'Pedido atualizado com sucesso' });
     } catch (err) {
